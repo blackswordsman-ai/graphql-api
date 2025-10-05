@@ -4,6 +4,7 @@ const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
+    GraphQLList,
 } = require("graphql");
 const User = require("../models/User");
 
@@ -23,28 +24,25 @@ const UserType = new GraphQLObjectType({
 });
 
 const RootQuery = new GraphQLObjectType({
+
   name: "RootQueryType",
   fields: {
+   users:{
+      type: new GraphQLList(UserType),
+      resolve(parents, args) {
+        return User.find();
+
+      }
+   },
+
     user: {
       type: UserType,
       args: { id: { type: GraphQLString } },
       resolve(parents, args) {
-        return users.find((user) => user.id === args.id);
+        return User.findById(args.id);
       },
     },
 
-    hello: {
-      type: GraphQLString,
-      resolve() {
-        return "Hello World From Graphql";
-      },
-    },
-    hi: {
-      type: GraphQLString,
-      resolve() {
-        return "Hi World From Graphql";
-      },
-    },
   },
 });
 
@@ -60,15 +58,13 @@ const Mutation = new GraphQLObjectType({
                 name: { type: GraphQLString },
                 age: { type: GraphQLInt }
             },
-            resolve(parent,args){
-               const user ={
-                id:users.length + 1 + "",
+            async resolve(parent,args){
+              const user = new User({
                 name: args.name,
-                age: args.age
-               }
-                users.push(user);
-                console.log(users);
-                return user;   
+                age:args.age
+               }) 
+               return await user.save(); 
+
             }
         },
         
@@ -79,17 +75,14 @@ const Mutation = new GraphQLObjectType({
                 name: { type: GraphQLString },
                 age: { type: GraphQLInt }
             },
-            resolve(parent,args){
-               const user = users.find(u => u.id === args.id);
-               if(user) {
-                user.name = args.name || user.name;
-                user.age = args.age || user.age;
+            async resolve(parent,args){
 
-                console.log(users);
-                return user; 
-               } 
-                throw new Error("User not found");
-               }
+                return await User.findByIdAndUpdate(
+                     args.id,
+                    {name: args.name, age: args.age},
+                    {new: true}
+                )
+            }
                 
         },
         deleteUser:{
@@ -99,11 +92,12 @@ const Mutation = new GraphQLObjectType({
                 name: { type: GraphQLString },
                 age: { type: GraphQLInt }
             },
-            resolve(parent,args){
-               const index = users.findIndex(u => u.id === args.id);
-                if(index === -1)  throw new Error("User not found");
-                return users.splice(index,1)[0];
-            
+            async resolve(parent,args){
+             
+           return await User.findByIdAndDelete(
+                args.id,
+            )
+
             }
                 
         }
