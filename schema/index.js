@@ -5,13 +5,16 @@ const {
   GraphQLList,
   GraphQLSchema,
   GraphQLInt,
+  GraphQLNonNull,
 } = require("graphql");
 const BookPaginationType = require("../types/BookPaginationType");
 const BookType = require("../types/BookType");
 const AuthorType = require("../types/AuthorType");
+const CategoryType = require("../types/CategoryType");
 
 const Book = require("../models/Book");
 const Author = require("../models/Author");
+const Category = require("../models/Catgory");
 
 // manipulate data
 const Mutation = new GraphQLObjectType({
@@ -32,12 +35,24 @@ const Mutation = new GraphQLObjectType({
       args: {
         title: { type: GraphQLString },
         authorId: { type: GraphQLID },
+        categoryId:{type: new GraphQLList(GraphQLID)},
       },
       resolve(parent, args) {
-        const book = new Book({ title: args.title, authorId: args.authorId });
+        const book = new Book({ title: args.title, authorId: args.authorId,categoryId:args.categoryId });
+
         return book.save();
       },
     },
+    addCategory: {
+       type:CategoryType,
+       args:{
+         name:{type: new GraphQLNonNull(GraphQLString)}
+       },
+       resolve(parent, args){
+          const category = new Category({name:args.name})
+          return category.save()
+       }
+    }
   },
 });
 
@@ -80,7 +95,25 @@ const RootQuery = new GraphQLObjectType({
               hasPreviousPage:page > 1 ? "true" : "false"
              }
         }
-    }
+              },
+        categories:{
+          type:new GraphQLList( CategoryType),
+          args:{
+            id:{type:GraphQLID}
+          },
+          resolve(parent, args){
+              return Category.find()
+          }
+        }  ,
+        category:{
+          type:CategoryType,
+          args:{id:{type:GraphQLID}},
+          resolve(parent, args){
+            return Category.findById(args.id);
+          }
+        }
+
+
     }
 });
 
