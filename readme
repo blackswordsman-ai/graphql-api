@@ -1,3 +1,5 @@
 #episode-9
 -one to many ,eg:author and book ,one auther can have multiple books
 -many to one implimentation 
+-pagination and filtering in graphql
+-args take input from the user()
