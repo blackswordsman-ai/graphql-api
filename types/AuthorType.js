@@ -6,12 +6,14 @@ const {
 } = require("graphql");
 
 const BookType = require("../types/BookType")
-const Book = require("../models/Book")
+
 
 
 const AuthorType = new GraphQLObjectType({
     name:"Author",
-    fields: () => ({
+    fields: () => {
+      const Book = require("../models/Book")
+      return {
         id:{type: GraphQLID},
         name:{type: GraphQLString},
         books:{
@@ -21,7 +23,7 @@ const AuthorType = new GraphQLObjectType({
           }
         }
 
-    })
+    }}
 })
 
 module.exports = AuthorType;
