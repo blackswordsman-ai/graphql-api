@@ -4,6 +4,11 @@ const categorySchema = new mongoose.Schema({
   name:{
     type:String,
     require:true
+  },
+  parentCategory:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Category",
+    default:null
   }
 });
 

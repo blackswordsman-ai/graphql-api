@@ -6,3 +6,4 @@
 -many to many relationship implimentation
 -In GraphQL, a resolver (or “resolve function”) is the function responsible for providing the value for a particular field in your schema()
 -In GraphQL, args (short for arguments) is a parameter passed into a resolver function. It represents the set of input values that the client provides in the query (or mutation) for that particular field.
+-impliment self referencing relationship
