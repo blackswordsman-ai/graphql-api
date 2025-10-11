@@ -16,6 +16,16 @@ const Book = require("../models/Book");
 const Author = require("../models/Author");
 const Category = require("../models/Catgory");
 
+
+// ------------------------------------------
+const Post =require("../models/Post");
+const Video =require("../models/Video");
+const Comment=require("../models/Comment");
+const PostType=require("../types/PostType");
+const VideoType=require("../types/VideoType");
+const CommentType=require("../types/CommentType");
+
+
 // manipulate data
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
@@ -58,7 +68,60 @@ const Mutation = new GraphQLObjectType({
           return category.save()
          
        }
+    },
+    // ----------------------
+    addPost:{
+      type:PostType,
+      args:{
+        title:{type:new GraphQLNonNull(GraphQLString)},
+        content:{type:GraphQLString},
+      },
+      resolve(parent,args){
+       const post = new Post({
+          title:args.title,
+          content:args.content
+        });
+        return post.save();
+      }
+      
+
+    },
+    addVideo:{
+      type:VideoType,
+      args:{
+        title:{type:new GraphQLNonNull(GraphQLString)},
+        url:{type:GraphQLString},
+      },
+      resolve(parent,args){
+       const video = new Video({
+          title:args.title,
+          url:args.url
+        });
+        return video.save();
+      }
+      
+
+    },
+     addComment:{
+      type:CommentType,
+      args:{
+        content:{type:new GraphQLNonNull(GraphQLString)},
+         commentabelId:{type:new GraphQLNonNull(GraphQLString)},
+         commentabelType:{type:new GraphQLNonNull(GraphQLString)}
+   
+      },
+      resolve(parent,args){
+       const comment = new Comment({
+          content:args.content,
+          commentabelId:args.commentabelId,
+          commentabelType:args.commentabelType
+        });
+        return comment.save();
+      }
+      
+
     }
+
   },
 });
 
@@ -110,15 +173,32 @@ const RootQuery = new GraphQLObjectType({
           resolve(parent, args){
               return Category.find()
           }
-        }  ,
+        } ,
         category:{
           type:CategoryType,
           args:{id:{type:GraphQLID}},
           resolve(parent, args){
             return Category.findById(args.id);
           }
+        },
+       posts:{
+        type: new GraphQLList(PostType),
+        resolve(){
+          return Post.find()
+        },
+       },
+       videos:{
+           type: new GraphQLList(VideoType),
+           resolve(){
+            return Video.find()
+           }
+        },
+         comments:{
+           type: new GraphQLList(CommentType),
+           resolve(){
+            return Comment.find()
+           }
         }
-
 
     }
 });
